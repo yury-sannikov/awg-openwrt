@@ -12,20 +12,16 @@ jobs:
     strategy:
       matrix:
         build_env:
-          - tag: "22.03.4"
-            pkgarch: mips_24kc
-            target: ath79
-            subtarget: nand
-            vermagic: "5c9be91b90bda5403fe3a7c4e8ddb26f"
-          - tag: "23.05.0"
-            pkgarch: mipsel_24kc
-            target: ramips
-            subtarget: mt7621
+          - tag: "18.06"
+            pkgarch: mips_siflower
+            target: siflower
+            subtarget: sf19a28-fullmask
             vermagic: "9c242f353867f49a96054ff8c9f2c460"
+         
           - tag: "23.05.2"
-            pkgarch: mipsel_24kc
-            target: ramips
-            subtarget: mt7621
+            pkgarch: mips_siflower
+            target: siflower
+            subtarget: sf19a28-fullmask
             vermagic: "9c242f353867f49a96054ff8c9f2c460"
 
     steps:
