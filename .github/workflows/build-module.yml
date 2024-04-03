@@ -15,7 +15,7 @@ jobs:
           - tag: "18.06"
             pkgarch: mips_siflower
             target: siflower
-            subtarget: siflower_sf19a28_fullmask
+            subtarget: nand
             vermagic: "9c242f353867f49a96054ff8c9f2c460"
     steps:
       - uses: actions/checkout@v4
