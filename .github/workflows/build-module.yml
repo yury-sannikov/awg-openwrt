@@ -16,7 +16,7 @@ jobs:
             pkgarch: aarch64_cortex-a53
             target: mediatek
             subtarget: mt7622
-            vermagic: "01c22519ce836afade4e782169e44ead"
+            vermagic: "03c9d191cd600eae3e66845031612f0a"
 
     steps:
       - uses: actions/checkout@v4
