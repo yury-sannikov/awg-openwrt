@@ -13,10 +13,10 @@ jobs:
       matrix:
         build_env:
           - tag: "23.05.3"
-            pkgarch: aarch64_cortex-a53
-            target: mediatek
-            subtarget: mt7622
-            vermagic: "03c9d191cd600eae3e66845031612f0a"
+            pkgarch: aarch64_cortex-a72
+            target: bcm27xx
+            subtarget: bcm2711
+            vermagic: "bd9c06a169c49b7613087c1d65b97108"
 
     steps:
       - uses: actions/checkout@v4
