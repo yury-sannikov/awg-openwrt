@@ -17,7 +17,16 @@ jobs:
             target: mediatek
             subtarget: filogic
             vermagic: "83850846aeb31a278a010941bbebf326"
-          
+          - tag: "23.05.3"
+            pkgarch: mipsel_24kc
+            target: ramips
+            subtarget: mt7621
+            vermagic: "94e97c3b21ec52cb72cec4eaff828985"
+          - tag: "18.06.4"
+            pkgarch: mipsel_24kc
+            target: ramips
+            subtarget: mt7621
+            vermagic: "94e97c3b21ec52cb72cec4eaff828985"
     steps:
       - uses: actions/checkout@v4
         with:
