@@ -1,22 +1,44 @@
 name: Create Release on Tag
 # on: [workflow_dispatch]
-# on:
-#   push:
-#     tags:
-#       - "v*.*.*"
+on:
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
+  generate-config:
+    runs-on: ubuntu-latest
+    outputs:
+      job-config: ${{ steps.generate-config.outputs.job-config }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0'
+
+      - name: Get OpenWRT version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Job Config
+        id: generate-config
+        run: node index.js ${{ env.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: "v${{ matrix.build_env.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
     runs-on: ubuntu-latest
+    needs: generate-config
     strategy:
       matrix:
-        build_env:
-          - tag: "23.05.4"
-            pkgarch: aarch64_cortex-a53
-            target: mediatek
-            subtarget: filogic
-            vermagic: "03ba5b5fee47f2232a088e3cd9832aec"
+        build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
 
     steps:
       - uses: actions/checkout@v4

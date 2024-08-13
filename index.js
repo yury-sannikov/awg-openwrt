@@ -1,8 +1,14 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const fs = require('fs');
+const core = require('@actions/core');
 
 const version = process.argv[2]; // Получение версии OpenWRT из аргумента командной строки
+
+if (!version) {
+  core.setFailed('Version argument is required');
+  process.exit(1);
+}
+
 const url = `https://downloads.openwrt.org/releases/${version}/targets/`;
 
 async function fetchHTML(url) {
@@ -60,25 +66,27 @@ async function getDetails(target, subtarget) {
 }
 
 async function main() {
-  const targets = await getTargets();
-  const results = [];
+  try {
+    const targets = await getTargets();
+    const jobConfig = [];
 
-  for (const target of targets) {
-    const subtargets = await getSubtargets(target);
-    for (const subtarget of subtargets) {
-      const { vermagic, pkgarch } = await getDetails(target, subtarget);
-      results.push({
-        tag: version,
-        target,
-        subtarget,
-        vermagic,
-        pkgarch,
-      });
+    for (const target of targets) {
+      const subtargets = await getSubtargets(target);
+      for (const subtarget of subtargets) {
+        const { vermagic, pkgarch } = await getDetails(target, subtarget);
+        jobConfig.push({
+          tag: version,
+          target,
+          subtarget,
+          vermagic,
+          pkgarch,
+        });
+      }
     }
+    core.setOutput('job-config', JSON.stringify(jobConfig));
+  } catch (error) {
+    core.setFailed(error.message);
   }
-
-  fs.writeFileSync('results.json', JSON.stringify(results, null, 2), 'utf-8');
-  console.log('Results written to results.json');
 }
 
-main().catch(console.error);
+main();
