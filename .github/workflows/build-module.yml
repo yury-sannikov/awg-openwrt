@@ -41,15 +41,6 @@ jobs:
         build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
 
     steps:
-      - name: Clean previous build artifacts
-        run: |
-          rm -rf bin/packages/*
-          rm -rf bin/targets/*
-          rm -rf build_dir/*
-          rm -rf dl/*
-          rm -rf tmp/*
-          rm -rf tools/*
-
       - uses: actions/checkout@v4
         with:
           repository: openwrt/openwrt
@@ -64,8 +55,6 @@ jobs:
         with:
           path: "**"
           key: ${{ runner.os }}-build-vm4-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.os }}-build-vm4-cache-tools-kernel-${{ matrix.build_env.tag }}-${{ matrix.build_env.pkgarch}}-
 
       - name: Building kernel and tools
         #if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
