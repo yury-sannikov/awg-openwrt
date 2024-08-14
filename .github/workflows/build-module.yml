@@ -41,6 +41,9 @@ jobs:
         build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
 
     steps:
+      - name: Clear Workspace
+        run: git clean -fdx
+
       - uses: actions/checkout@v4
         with:
           repository: openwrt/openwrt
@@ -127,7 +130,7 @@ jobs:
         run: |
           tag_name=${{  github.ref_name }}
           mkdir -p awgrelease
-          postfix="${tag_name}_v${{ matrix.build_env.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          postfix="v${{ matrix.build_env.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amneziawg-tools_*.ipk awgrelease/amneziawg-tools_${postfix}.ipk
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
           cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
@@ -136,4 +139,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: awgrelease/*.ipk
-
