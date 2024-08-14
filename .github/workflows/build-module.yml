@@ -41,8 +41,14 @@ jobs:
         build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
 
     steps:
-      - name: Clear Workspace
-        run: git clean -fdx
+      - name: Clean previous build artifacts
+        run: |
+          rm -rf bin/packages/*
+          rm -rf bin/targets/*
+          rm -rf build_dir/*
+          rm -rf dl/*
+          rm -rf tmp/*
+          rm -rf tools/*
 
       - uses: actions/checkout@v4
         with:
