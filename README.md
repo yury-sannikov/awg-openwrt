@@ -1,3 +1,6 @@
+# Автоматическая настройка AmneziaWG для OpenWRT версии 23.05.0 и более новых
+Для автоматической настройки рекомендую использовать [скрипт](https://github.com/itdoginfo/domain-routing-openwrt) от пользователя itdog. Этот скрипт позволяет автоматически скачать нужные пакеты из собранных здесь и настроить [точечный обход блокировок по доменам](https://habr.com/ru/articles/767464/).
+
 # Сборка пакетов для всех устройств, поддерживающих OpenWRT
 В репозиторий в ветку `feat/build-for-all-devices` добавлен скрипт, который парсит данные о поддерживаемых платформах со страницы OpenWRT и автоматически запускает сборку пакетов AmneziaWG для всех устройств.
 На данный момент я собрал пакеты для всех устройств для OpenWRT версий:
@@ -28,6 +31,9 @@
 
 ## Сборка пакетов под определенную платформу
 Как запустить сборку пакетов для определенной платформы можно посмотреть в [инструкции на вики](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build). Сборка под одно устройство займет около 2 часов.
+
+# Automatic configuration of AmneziaWG for OpenWRT version 23.05.0 and newer
+For automatic configuration, I recommend using the [script](https://github.com/itdoginfo/domain-routing-openwrt) from the user itdog. This script allows you to automatically download the necessary packages from those collected here and configure [point-by-point bypass of blocking by domains](https://habr.com/ru/articles/767464/) (instructions in Russian).
 
 # Building packages for all devices that support OpenWRT
 A script has been added to the repository in the `feat/build-for-all-devices` branch that parses data on supported platforms from the OpenWRT page and automatically starts building AmneziaWG packages for all devices.
