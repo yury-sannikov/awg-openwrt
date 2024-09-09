@@ -15,17 +15,17 @@ jobs:
           - tag: "24.12.2"
             pkgarch: mipsel_24kc
             target: ramips
-            subtarget: mt76x8
+            subtarget: mt7628
             vermagic: "40670cd8a3fe024d1e9f6d00a9698c1f"
           - tag: "24.12.2"
             pkgarch: mipsel_24kc
             target: ramips
-            subtarget: mt76x8
+            subtarget: mt7628
             vermagic: "40670cd8a3fe024d1e9f6d00a9698c1f"
           - tag: "24.12.2"
             pkgarch: mipsel_24kc
             target: ramips
-            subtarget: mt76x8
+            subtarget: mt7628
             vermagic: "40670cd8a3fe024d1e9f6d00a9698c1f"
 
     steps:
