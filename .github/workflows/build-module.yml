@@ -1,5 +1,5 @@
 name: Create Release on Tag
-# on: [workflow_dispatch]
+# on: [workflow_dispatch] x3
 on:
   push:
     tags:
