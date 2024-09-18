@@ -4,12 +4,15 @@ const core = require('@actions/core');
 
 const version = process.argv[2]; // Получение версии OpenWRT из аргумента командной строки
 
+// mediatek, ramips
+const SNAPSHOT_SUBTARGETS_TO_BUILD = ['filogic', 'mt7622', 'mt7623', 'mt7629', 'mt7620', 'mt7621', 'mt76x8'];
+
 if (!version) {
   core.setFailed('Version argument is required');
   process.exit(1);
 }
 
-const url = `https://downloads.openwrt.org/releases/${version}/targets/`;
+const url = version === 'SNAPSHOT' ? 'https://downloads.openwrt.org/snapshots/targets/' : `https://downloads.openwrt.org/releases/${version}/targets/`;
 
 async function fetchHTML(url) {
   try {
@@ -54,7 +57,7 @@ async function getDetails(target, subtarget) {
   $('a').each((index, element) => {
     const name = $(element).attr('href');
     if (name && name.startsWith('kernel_')) {
-      const vermagicMatch = name.match(/kernel_5\.\d+\.\d+-\d+-([a-f0-9]+)_([a-zA-Z0-9_-]+)\.ipk$/);
+      const vermagicMatch = name.match(/kernel_\d+\.\d+\.\d+(?:-\d+)?[-~]([a-f0-9]+)(?:-r\d+)?_([a-zA-Z0-9_-]+)\.ipk$/);
       if (vermagicMatch) {
         vermagic = vermagicMatch[1];
         pkgarch = vermagicMatch[2];
@@ -74,15 +77,19 @@ async function main() {
       const subtargets = await getSubtargets(target);
       for (const subtarget of subtargets) {
         const { vermagic, pkgarch } = await getDetails(target, subtarget);
-        jobConfig.push({
-          tag: version,
-          target,
-          subtarget,
-          vermagic,
-          pkgarch,
-        });
+
+        if (version !== 'SNAPSHOT' || SNAPSHOT_SUBTARGETS_TO_BUILD.includes(subtarget)) {
+          jobConfig.push({
+            tag: version,
+            target,
+            subtarget,
+            vermagic,
+            pkgarch,
+          });
+        }
       }
     }
+
     core.setOutput('job-config', JSON.stringify(jobConfig));
   } catch (error) {
     core.setFailed(error.message);
