@@ -1,10 +1,14 @@
 name: Build AmneziaWG for snapshot OpenWRT
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+
 on:
   push:
     tags:
       - "SNAPSHOT"
-  # schedule:
-  #   - cron: '0 */4 * * *'
+  schedule:
+    - cron: '0 */4 * * *'
 
 jobs:
   generate-config:
@@ -26,8 +30,6 @@ jobs:
       - name: Generate Job Config
         id: generate-config
         run: node index.js SNAPSHOT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     name: "${{ matrix.build_env.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
@@ -39,7 +41,31 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Check if release file exists
+        id: check_release
+        run: |
+          postfix="${{ matrix.build_env.tag }}_${{ matrix.build_env.vermagic }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          RELEASE_FILE="kmod-amneziawg_${postfix}.ipk"
+
+          echo "Checking for release file: $RELEASE_FILE"
+
+          # Используем GitHub CLI для проверки наличия файла в релизе
+          if gh release view $matrix.build_env.tag --repo Slava-Shchipunov/awg-openwrt --json assets --jq ".assets | .[].name" | grep -q "$RELEASE_FILE"; then
+            echo "Release file $RELEASE_FILE already exists. Skipping job."
+            echo "FILE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "FILE_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+      # Прерываем job'у, если файл уже существует
+      - name: Skip job if release file exists
+        if: env.FILE_EXISTS == 'true'
+        run: |
+          echo "Skipping job as release file already exists."
+          exit 0
+
       - name: Get snapshot commit SHA and device ARCH
+        if: env.FILE_EXISTS == 'false'
         run: |
           PROFILE_URL="https://downloads.openwrt.org/snapshots/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/profiles.json"
           SNAPSHOT_COMMIT_SHA=$(wget -q $PROFILE_URL -O- | tr ',' '\n' | grep "version_code"| awk -F: '{print $2}' | tr -d '"' | awk -F- '{print $2}')
@@ -51,14 +77,17 @@ jobs:
           echo "DEVICE_ARCH=$DEVICE_ARCH" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
+        if: env.FILE_EXISTS == 'false'
         with:
           repository: openwrt/openwrt
           fetch-depth: 0
 
       - name: Checkout snapshot commit in openwrt repo
+        if: env.FILE_EXISTS == 'false'
         run: git checkout ${{ env.SNAPSHOT_COMMIT_SHA}}
 
       - name: Building kernel and tools
+        if: env.FILE_EXISTS == 'false'
         run: |
           echo "pkgarch: ${{ matrix.build_env.pkgarch}}, target:${{ matrix.build_env.target}}, subtarget: ${{ matrix.build_env.subtarget}}"
 
@@ -101,6 +130,7 @@ jobs:
           fi
 
       - name: Build AmneziaWG
+        if: env.FILE_EXISTS == 'false'
         run: |
           VERMAGIC=`cat ./build_dir/target-*/linux-*/linux-*/.vermagic`
           echo "Vermagic: $VERMAGIC"
@@ -123,6 +153,7 @@ jobs:
           make V=s package/amneziawg-tools/compile
 
       - name: Prepare artifacts
+        if: env.FILE_EXISTS == 'false'
         run: |
           tag_name=${{  github.ref_name }}
           mkdir -p awgrelease
@@ -131,7 +162,23 @@ jobs:
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
           cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
 
+      - name: Delete old release assets
+        if: env.FILE_EXISTS == 'false'
+        run: |
+          postfix="${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          echo "Looking for old release files ending with: ${postfix}"
+
+          # Получаем список всех артефактов релиза
+          assets=$(gh release view "${{ matrix.build_env.tag }}" --repo Slava-Shchipunov/awg-openwrt --json assets --jq ".assets | .[] | select(.name | endswith(\"$postfix.ipk\")) | .id")
+
+          # Удаляем найденные артефакты
+          for asset_id in $assets; do
+            echo "Deleting asset with ID: $asset_id"
+            gh release delete-asset "${{ matrix.build_env.tag }}" "$asset_id" --repo Slava-Shchipunov/awg-openwrt
+          done
+
       - name: Release
+        if: env.FILE_EXISTS == 'false'
         uses: softprops/action-gh-release@v1
         with:
           files: awgrelease/*.ipk
