@@ -39,6 +39,7 @@ jobs:
     strategy:
       matrix:
         build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
