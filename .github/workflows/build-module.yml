@@ -6,17 +6,39 @@ on:
       - "v*.*.*"
 
 jobs:
+  generate-config:
+    runs-on: ubuntu-latest
+    outputs:
+      job-config: ${{ steps.generate-config.outputs.job-config }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0'
+
+      - name: Get OpenWRT version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Job Config
+        id: generate-config
+        run: node index.js ${{ env.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: "v${{ matrix.build_env.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
     runs-on: ubuntu-latest
+    needs: generate-config
     strategy:
       matrix:
-        build_env:
-          - tag: "23.05.4"
-            pkgarch: aarch64_cortex-a53
-            target: mediatek
-            subtarget: filogic
-            vermagic: "03ba5b5fee47f2232a088e3cd9832aec"
+        build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -33,8 +55,6 @@ jobs:
         with:
           path: "**"
           key: ${{ runner.os }}-build-vm4-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.os }}-build-vm4-cache-tools-kernel-${{ matrix.build_env.tag }}-${{ matrix.build_env.pkgarch}}-
 
       - name: Building kernel and tools
         #if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
@@ -43,7 +63,7 @@ jobs:
 
           # Setup & install feeds
           wget https://downloads.openwrt.org/releases/${{ matrix.build_env.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/feeds.buildinfo -O feeds.conf
-          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
+          echo "src-git awgopenwrt https://github.com/Slava-Shchipunov/awg-openwrt.git" >> ./feeds.conf
           ./scripts/feeds update && ./scripts/feeds install -a
 
           # Setup config with AWG and dependencies
@@ -105,7 +125,7 @@ jobs:
         run: |
           tag_name=${{  github.ref_name }}
           mkdir -p awgrelease
-          postfix="${tag_name}_v${{ matrix.build_env.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          postfix="v${{ matrix.build_env.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amneziawg-tools_*.ipk awgrelease/amneziawg-tools_${postfix}.ipk
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
           cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
@@ -114,4 +134,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: awgrelease/*.ipk
-
