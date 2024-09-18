@@ -52,8 +52,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: openwrt/openwrt
-          ref: ${{ env.SNAPSHOT_COMMIT_SHA }}
           fetch-depth: 0
+
+      - name: Checkout snapshot commit in openwrt repo
+        working-directory: ./openwrt
+        run: git checkout ${{ env.SNAPSHOT_COMMIT_SHA}}
 
       - name: Building kernel and tools
         run: |
