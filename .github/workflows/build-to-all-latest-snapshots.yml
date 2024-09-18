@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: openwrt/openwrt
-          ref: ${{ SNAPSHOT_COMMIT_SHA }}
+          ref: ${{ env.SNAPSHOT_COMMIT_SHA }}
           fetch-depth: 0
 
       - name: Building kernel and tools
