@@ -4,6 +4,9 @@ const core = require('@actions/core');
 
 const version = process.argv[2]; // Получение версии OpenWRT из аргумента командной строки
 
+// mediatek, ramips
+const SNAPSHOT_SUBTARGETS_TO_BUILD = ['filogic', 'mt7622', 'mt7623', 'mt7629', 'mt7620', 'mt7621', 'mt76x8'];
+
 if (!version) {
   core.setFailed('Version argument is required');
   process.exit(1);
@@ -74,15 +77,19 @@ async function main() {
       const subtargets = await getSubtargets(target);
       for (const subtarget of subtargets) {
         const { vermagic, pkgarch } = await getDetails(target, subtarget);
-        jobConfig.push({
-          tag: version,
-          target,
-          subtarget,
-          vermagic,
-          pkgarch,
-        });
+
+        if (version !== 'SNAPSHOT' || SNAPSHOT_SUBTARGETS_TO_BUILD.includes(subtarget)) {
+          jobConfig.push({
+            tag: version,
+            target,
+            subtarget,
+            vermagic,
+            pkgarch,
+          });
+        }
       }
     }
+
     core.setOutput('job-config', JSON.stringify(jobConfig));
   } catch (error) {
     core.setFailed(error.message);
