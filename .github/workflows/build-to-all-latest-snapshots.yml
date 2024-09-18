@@ -36,6 +36,7 @@ jobs:
     strategy:
       matrix:
         build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
+      fail-fast: false
 
     steps:
       - name: Get snapshot commit SHA and device ARCH
