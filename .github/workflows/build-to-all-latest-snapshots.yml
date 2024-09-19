@@ -9,6 +9,7 @@ on:
       - "SNAPSHOT"
   schedule:
     - cron: '0 */4 * * *'
+  workflow_dispatch:
 
 jobs:
   generate-config:
