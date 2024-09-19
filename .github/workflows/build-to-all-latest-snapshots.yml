@@ -47,11 +47,12 @@ jobs:
         run: |
           postfix="${{ matrix.build_env.tag }}_${{ matrix.build_env.vermagic }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
           RELEASE_FILE="kmod-amneziawg_${postfix}.ipk"
+          TAG=${{ matrix.build_env.tag }}
 
-          echo "Checking for release file: $RELEASE_FILE"
+          echo "Checking for release file: $RELEASE_FILE in release: $TAG"
 
           # Используем GitHub CLI для проверки наличия файла в релизе
-          if gh release view $matrix.build_env.tag --repo Slava-Shchipunov/awg-openwrt --json assets --jq ".assets | .[].name" | grep -q "$RELEASE_FILE"; then
+          if gh release view "$TAG" --repo Slava-Shchipunov/awg-openwrt --json assets --jq ".assets | .[].name" | grep -q "$RELEASE_FILE"; then
             echo "Release file $RELEASE_FILE already exists. Skipping job."
             echo "FILE_EXISTS=true" >> $GITHUB_ENV
           else
@@ -166,7 +167,7 @@ jobs:
       - name: Delete old release assets
         if: env.FILE_EXISTS == 'false'
         run: |
-          postfix="${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          postfix="${{ matrix.build_env.pkgarch }}_${{ matrix.build_env.target }}_${{ matrix.build_env.subtarget }}"
           echo "Looking for old release files ending with: ${postfix}"
 
           # Получаем список всех артефактов релиза
