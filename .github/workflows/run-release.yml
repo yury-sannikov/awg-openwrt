@@ -1,0 +1,48 @@
+name: Sync OpenWRT Releases
+
+on:
+  schedule:
+    - cron: '0 0 */3 * *' # Проверка новых релизов раз в три дня
+  workflow_dispatch: # Возможность вручную запустить Action
+
+jobs:
+  sync-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+
+      - name: Get the latest release from OpenWRT
+        id: get_release
+        run: |
+          curl -s https://api.github.com/repos/openwrt/openwrt/releases/latest > latest_release.json
+          RELEASE_TAG=$(jq -r .tag_name latest_release.json)
+          RELEASE_NAME=$(jq -r .name latest_release.json)
+          echo "::set-output name=release_tag::$RELEASE_TAG"
+          echo "::set-output name=release_name::$RELEASE_NAME"
+
+      - name: Check if release exists in your repo
+        id: check_release
+        run: |
+          curl -s https://api.github.com/repos/Slava-Shchipunov/awg-openwrt/releases/tags/${{ steps.get_release.outputs.release_tag }} | jq -r .tag_name || echo "Not found"
+
+      - name: Create release in your repo
+        if: steps.check_release.outputs.tag_name == 'Not found'
+        run: |
+          ART="
+  _______                     ________        __
+ |       |.-----.-----.-----.|  |  |  |.----.|  |_
+ |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
+ |_______||   __|_____|__|__||________||__|  |____|
+          |__| A M N E Z I A   W I R E G U A R D
+ -----------------------------------------------------
+ OpenWrt ${{ steps.get_release.outputs.release_tag }}
+ -----------------------------------------------------"
+          curl -X POST https://api.github.com/repos/Slava-Shchipunov/awg-openwrt/releases \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "tag_name": "'${{ steps.get_release.outputs.release_tag }}'",
+              "name": "Build amnezia wg for all devices with openwrt '${{ steps.get_release.outputs.release_tag }}'",
+              "body": "'"${ART}"'\n\nAutomatically created release for OpenWRT '${{ steps.get_release.outputs.release_tag }}'."
+            }'
