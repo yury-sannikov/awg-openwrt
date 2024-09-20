@@ -30,14 +30,14 @@ jobs:
         if: steps.check_release.outputs.tag_name == 'Not found'
         run: |
           ART="
-  _______                     ________        __
- |       |.-----.-----.-----.|  |  |  |.----.|  |_
- |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
- |_______||   __|_____|__|__||________||__|  |____|
-          |__| A M N E Z I A   W I R E G U A R D
- -----------------------------------------------------
- OpenWrt ${{ steps.get_release.outputs.release_tag }}
- -----------------------------------------------------"
+            _______                     ________        __
+          |       |.-----.-----.-----.|  |  |  |.----.|  |_
+          |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
+          |_______||   __|_____|__|__||________||__|  |____|
+                    |__| A M N E Z I A   W I R E G U A R D
+          -----------------------------------------------------
+          OpenWrt ${{ steps.get_release.outputs.release_tag }}
+          -----------------------------------------------------"
           curl -X POST https://api.github.com/repos/Slava-Shchipunov/awg-openwrt/releases \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/json" \
