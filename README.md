@@ -10,7 +10,14 @@
 4) [23.05.3](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/v23.05.3)
 5) [23.05.4](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/v23.05.4)
 
+И собрал пакеты для популярных устройств для OpenWRT [SNAPSHOT](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/SNAPSHOT)
+
 Также запускал сборку для версии [22.03.7](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/v22.03.7), но там для двух платформ сборка завершилась ошибкой. Так как это достаточно старая версия OpenWRT, я не стал разбираться, в чем проблема.
+
+В дальнейшем при выходе новых релизов OpenWRT будут автоматически создаваться релизы с пакетами AmneziaWG и запускаться сборка пакетов под все устройства, поддерживаемые новой версией. Github action для проверки появления нового релиза запускается автоматически раз в 3 дня, а также может быть запущен вручную.
+
+## Автоматическая сборка пакетов для SNAPSHOT версии
+В репозитории настроен github action, который запускается каждые 4 часа и проверяет [страницу снапшотов](https://downloads.openwrt.org/snapshots/targets/) сайта OpenWRT. При этом, если для какой-то платформы обнаруживается снапшот с более новой версией ядра, запускается сборка пакетов под эту платформу, а новые файлы заменяют старые. В целях экономии ресурсов и ускорения процесса сборки, пакеты собираются только для популярных платформ, которые указаны в массиве `SNAPSHOT_SUBTARGETS_TO_BUILD` в файле index.js.
 
 ## Выбор пакетов для своего устройства
 В соответствии с пунктом [Указываем переменные для сборки](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build#%D1%83%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B4%D0%BB%D1%8F-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8)
@@ -43,7 +50,14 @@ At the moment I have collected packages for all devices for OpenWRT versions:
 4) [23.05.3](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/v23.05.3)
 5) [23.05.4](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/v23.05.4)
 
+And collected packages for popular devices for OpenWRT [SNAPSHOT](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/SNAPSHOT)
+
 I also ran the build for version [22.03.7](https://github.com/Slava-Shchipunov/awg-openwrt/releases/tag/v22.03.7), but the build ended with an error for two platforms. Since this is a fairly old version of OpenWRT, I did not bother to figure out what the problem was.
+
+In the future, when new OpenWRT releases are released, releases with AmneziaWG packages will be automatically created and the package build will be launched for all devices supported by the new version. Github action for checking for a new release is launched automatically every 3 days, and can also be launched manually.
+
+## Automatic package build for SNAPSHOT version
+A github action is configured in the repository, which runs every 4 hours and checks the [snapshots page](https://downloads.openwrt.org/snapshots/targets/) of the OpenWRT website. At the same time, if a snapshot with a newer kernel version is found for some platform, the package build for this platform is launched, and the new files replace the old ones. In order to save resources and speed up the build process, packages are built only for popular platforms, which are specified in the `SNAPSHOT_SUBTARGETS_TO_BUILD` array in the index.js file.
 
 ## Selecting packages for your device
 In accordance with the paragraph [Specify variables for builds](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build#%D1%83%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B4%D0%BB%D1%8F-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8) (instructions in Russian) determine `target` and `subtarget` of your device. Then go to the release page corresponding to your OpenWRT version, then search the page (Ctrl+F) to find 3 packages whose names end in `target_subtarget.ipk` corresponding to your device.
