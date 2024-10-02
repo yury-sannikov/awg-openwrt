@@ -53,3 +53,9 @@ jobs:
                     --arg name "Build amnezia wg for all devices with openwrt ${{ steps.get_release.outputs.release_tag }}" \
                     --arg body "$ART" \
                     '{ tag_name: $tag, name: $name, body: $body }')"
+
+      - name: Run build job
+        if: steps.check_release.outputs.release_exists == 'false'
+        uses: .github/workflows/build-module.yml
+        with:
+          tag_name: ${{ steps.get_release.outputs.release_tag }}
