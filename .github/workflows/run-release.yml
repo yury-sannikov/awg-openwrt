@@ -43,11 +43,11 @@ jobs:
           -----------------------------------------------------
           OpenWrt ${{ steps.get_release.outputs.release_tag }}
           -----------------------------------------------------"
+
           curl -X POST https://api.github.com/repos/Slava-Shchipunov/awg-openwrt/releases \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "tag_name": "'${{ steps.get_release.outputs.release_tag }}'",
-              "name": "Build amnezia wg for all devices with openwrt '${{ steps.get_release.outputs.release_tag }}'",
-              "body": "'"${ART}"'\n\nAutomatically created release for OpenWRT '${{ steps.get_release.outputs.release_tag }}'."
-            }'
+            -d "$(jq -n --arg tag "${{ steps.get_release.outputs.release_tag }}" \
+                    --arg name "Build amnezia wg for all devices with openwrt ${{ steps.get_release.outputs.release_tag }}" \
+                    --arg body "$ART\n\nAutomatically created release for OpenWRT ${{ steps.get_release.outputs.release_tag }}." \
+                    '{ tag_name: $tag, name: $name, body: $body }')"
