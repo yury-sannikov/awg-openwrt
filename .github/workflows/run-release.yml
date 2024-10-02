@@ -56,6 +56,6 @@ jobs:
 
       - name: Run build job
         if: steps.check_release.outputs.release_exists == 'false'
-        uses: .github/workflows/build-module.yml
+        uses: Slava-Shchipunov/awg-openwrt/.github/workflows/build-module.yml
         with:
           tag_name: ${{ steps.get_release.outputs.release_tag }}
