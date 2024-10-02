@@ -35,19 +35,21 @@ jobs:
         if: steps.check_release.outputs.release_exists == 'false'
         run: |
           ART="
+          ```
             _______                     ________        __
-          |       |.-----.-----.-----.|  |  |  |.----.|  |_
-          |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
-          |_______||   __|_____|__|__||________||__|  |____|
+           |       |.-----.-----.-----.|  |  |  |.----.|  |_
+           |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
+           |_______||   __|_____|__|__||________||__|  |____|
                     |__| A M N E Z I A   W I R E G U A R D
           -----------------------------------------------------
           OpenWrt ${{ steps.get_release.outputs.release_tag }}
-          -----------------------------------------------------"
+          -----------------------------------------------------
+          ```"
 
           curl -X POST https://api.github.com/repos/Slava-Shchipunov/awg-openwrt/releases \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n --arg tag "${{ steps.get_release.outputs.release_tag }}" \
                     --arg name "Build amnezia wg for all devices with openwrt ${{ steps.get_release.outputs.release_tag }}" \
-                    --arg body "$ART\n\nAutomatically created release for OpenWRT ${{ steps.get_release.outputs.release_tag }}." \
+                    --arg body "$ART" \
                     '{ tag_name: $tag, name: $name, body: $body }')"
