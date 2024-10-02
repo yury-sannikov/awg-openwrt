@@ -8,6 +8,8 @@ on:
 jobs:
   sync-releases:
     runs-on: ubuntu-latest
+    outputs:
+      release_exists: ${{ steps.check_release.outputs.release_exists }}
     steps:
       - name: Checkout your repo
         uses: actions/checkout@v4
