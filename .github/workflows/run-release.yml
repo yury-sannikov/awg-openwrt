@@ -23,11 +23,12 @@ jobs:
 
       - name: Check if release exists in your repo
         id: check_release
+        continue-on-error: true
         run: |
           curl -s https://api.github.com/repos/Slava-Shchipunov/awg-openwrt/releases/tags/${{ steps.get_release.outputs.release_tag }} | jq -r .tag_name || echo "Not found"
 
       - name: Create release in your repo
-        if: steps.check_release.outputs.tag_name == 'Not found'
+        if: failure() || steps.check_release.outputs.tag_name == 'null'
         run: |
           ART="
             _______                     ________        __
