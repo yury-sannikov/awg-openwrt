@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_exists: ${{ steps.check_release.outputs.release_exists }}
+      release_tag: ${{ steps.get_release.outputs.release_tag }} 
     steps:
       - name: Checkout your repo
         uses: actions/checkout@v4
