@@ -1,5 +1,4 @@
 name: Create Release on Tag
-# on: [workflow_dispatch]
 on:
   push:
     tags:
@@ -12,11 +11,11 @@ jobs:
     strategy:
       matrix:
         build_env:
-          - tag: "18.06"
-            pkgarch: mips_siflower
-            target: siflower
-            subtarget: nand
-            vermagic: "9c242f353867f49a96054ff8c9f2c460"
+          - tag: "23.05.4"
+            pkgarch: arm_cortex-a7_neon-vfpv4
+            target: sunxi
+            subtarget: cortexa7
+            vermagic: "2a1dc388b07260a9b68c352de6e06505"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,21 +29,18 @@ jobs:
         env:
           cache-name: "cache-tools-kernel-${{ matrix.build_env.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
         with:
-          path: "**"
+          path: build_dir
           key: ${{ runner.os }}-build-vm4-${{ env.cache-name }}
           restore-keys: |
             ${{ runner.os }}-build-vm4-cache-tools-kernel-${{ matrix.build_env.tag }}-${{ matrix.build_env.pkgarch}}-
 
       - name: Building kernel and tools
-        #if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
         run: |
           echo "pkgarch: ${{ matrix.build_env.pkgarch}}, target:${{ matrix.build_env.target}}, subtarget: ${{ matrix.build_env.subtarget}}"
-
           # Setup & install feeds
           wget https://downloads.openwrt.org/releases/${{ matrix.build_env.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/feeds.buildinfo -O feeds.conf
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
           ./scripts/feeds update && ./scripts/feeds install -a
-
           # Setup config with AWG and dependencies
           wget https://downloads.openwrt.org/releases/${{ matrix.build_env.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
           echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
@@ -53,26 +49,18 @@ jobs:
           echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
           echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
           echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
-
           make defconfig
-
           echo "    > make tools/install"
-          make tools/install -i -j `nproc`
-
+          +make tools/install -i -j `nproc`
           cat ./build_dir/target-*/linux-*/linux-*/.vermagic || true
-
           echo "    > make toolchain/install"
-          make toolchain/install  -i -j `nproc`
-
+          +make toolchain/install -i -j `nproc`
           cat ./build_dir/target-*/linux-*/linux-*/.vermagic || true
-
           # compile kernel module
           echo "    > make target/linux/compile"
-          make target/linux/compile  -i -j `nproc` V=s
-
+          +make target/linux/compile  -i -j `nproc` V=s
           VERMAGIC=`cat ./build_dir/target-*/linux-*/linux-*/.vermagic`
           VERMAGIC_EXPECTED=${{ matrix.build_env.vermagic }}
-
           if [ "$VERMAGIC" != "$VERMAGIC_EXPECTED" ]; then
             echo Vermagic mismatch: $VERMAGIC, expected $VERMAGIC_EXPECTED
             exit 1
@@ -82,27 +70,22 @@ jobs:
         run: |
           VERMAGIC=`cat ./build_dir/target-*/linux-*/linux-*/.vermagic`
           echo "Vermagic: $VERMAGIC"
-
           VERMAGIC_EXPECTED=${{ matrix.build_env.vermagic }}
-
           if [ "$VERMAGIC" != "$VERMAGIC_EXPECTED" ]; then
             echo Vermagic mismatch: $VERMAGIC, expected $VERMAGIC_EXPECTED
             exit 1
           fi
-
           # Ignore kmod build for some targets, replace with the awg-go
-          make package/kmod-amneziawg/{clean,download,prepare} V=s || true
-          make package/kmod-amneziawg/compile V=s || true
-
-          make package/luci-app-amneziawg/{clean,download,prepare}
-          make package/luci-app-amneziawg/compile V=s
-
-          make V=s package/amneziawg-tools/{clean,download,prepare}
-          make V=s package/amneziawg-tools/compile
+          +make package/kmod-amneziawg/{clean,download,prepare} V=s || true
+          +make package/kmod-amneziawg/compile V=s || true
+          +make package/luci-app-amneziawg/{clean,download,prepare}
+          +make package/luci-app-amneziawg/compile V=s
+          +make V=s package/amneziawg-tools/{clean,download,prepare}
+          +make V=s package/amneziawg-tools/compile
 
       - name: Prepare artifacts
         run: |
-          tag_name=${{  github.ref_name }}
+          tag_name=${{ github.ref_name }}
           mkdir -p awgrelease
           postfix="${tag_name}_v${{ matrix.build_env.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amneziawg-tools_*.ipk awgrelease/amneziawg-tools_${postfix}.ipk
@@ -113,4 +96,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: awgrelease/*.ipk
-
