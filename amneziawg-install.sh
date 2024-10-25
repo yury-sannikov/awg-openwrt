@@ -165,6 +165,8 @@ configure_amneziawg_interface() {
     uci set network.@${CONFIG_NAME}[0].endpoint_port=$AWG_ENDPOINT_PORT_INT
     uci commit network
 
+    sleep 5
+
     if ! uci show firewall | grep -q "@zone.*name='${ZONE_NAME}'"; then
         printf "\033[32;1mZone Create\033[0m\n"
         uci add firewall zone
@@ -197,7 +199,7 @@ check_repo
 
 install_awg_packages
 
-printf "Do you want to configure the amneziawg interface? (y/n): "
+printf "\033[32;1mDo you want to configure the amneziawg interface? (y/n): \033[0m\n"
 read IS_SHOULD_CONFIGURE_AWG_INTERFACE
 
 if [ "$IS_SHOULD_CONFIGURE_AWG_INTERFACE" = "y" ] || [ "$IS_SHOULD_CONFIGURE_AWG_INTERFACE" = "Y" ]; then
