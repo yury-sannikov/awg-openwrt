@@ -160,7 +160,8 @@ configure_amneziawg_interface() {
     uci set network.@${CONFIG_NAME}[0].route_allowed_ips='1'
     uci set network.@${CONFIG_NAME}[0].persistent_keepalive='25'
     uci set network.@${CONFIG_NAME}[0].endpoint_host=$AWG_ENDPOINT_INT
-    uci set network.@${CONFIG_NAME}[0].allowed_ips='0.0.0.0/0 ::/0'
+    uci set network.@${CONFIG_NAME}[0].allowed_ips='0.0.0.0/0'
+    uci add_list network.@${CONFIG_NAME}[0].allowed_ips='::/0'
     uci set network.@${CONFIG_NAME}[0].endpoint_port=$AWG_ENDPOINT_PORT_INT
     uci commit network
 
