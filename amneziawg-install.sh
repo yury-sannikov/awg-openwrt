@@ -2,6 +2,12 @@
 
 #set -x
 
+#Репозиторий OpenWRT должен быть доступен для установки зависимостей пакета kmod-amneziawg
+check_repo() {
+    printf "\033[32;1mChecking OpenWrt repo availability...\033[0m\n"
+    opkg update | grep -q "Failed to download" && printf "\033[32;1mopkg failed. Check internet or date. Command for force ntp sync: ntpd -p ptbtime1.ptb.de\033[0m\n" && exit 1
+}
+
 install_awg_packages() {
     # Получение pkgarch с наибольшим приоритетом
     PKGARCH=$(opkg print-architecture | awk 'BEGIN {max=0} {if ($3 > max) {max = $3; arch = $2}} END {print arch}')
@@ -158,6 +164,8 @@ configure_amneziawg_interface() {
     uci set network.@${CONFIG_NAME}[0].endpoint_port=$AWG_ENDPOINT_PORT_INT
     uci commit network
 }
+
+check_repo
 
 install_awg_packages
 
