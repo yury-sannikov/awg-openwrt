@@ -97,15 +97,15 @@ install_awg_packages() {
 }
 
 configure_amneziawg_interface() {
-    INTERFACE_NAME="awg0"
-    CONFIG_NAME="amneziawg_0"
+    INTERFACE_NAME="awg1"
+    CONFIG_NAME="amneziawg_awg1"
     PROTO="amneziawg"
-    ZONE_NAME="awg0"
+    ZONE_NAME="awg1"
 
     read -r -p "Enter the private key (from [Interface]):"$'\n' AWG_PRIVATE_KEY_INT
 
     while true; do
-        read -r -p "Enter internal IP address with subnet, example 192.168.100.5/24 (Address from [Interface]):"$'\n' AWG_IP
+        read -r -p "Enter internal IP address with subnet, example 192.168.100.5/24 (from [Interface]):"$'\n' AWG_IP
         if echo "$AWG_IP" | egrep -oq '^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]+$'; then
             break
         else
@@ -165,8 +165,6 @@ configure_amneziawg_interface() {
     uci set network.@${CONFIG_NAME}[0].endpoint_port=$AWG_ENDPOINT_PORT_INT
     uci commit network
 
-    sleep 5
-
     if ! uci show firewall | grep -q "@zone.*name='${ZONE_NAME}'"; then
         printf "\033[32;1mZone Create\033[0m\n"
         uci add firewall zone
@@ -191,8 +189,6 @@ configure_amneziawg_interface() {
         uci set firewall.@forwarding[-1].family='ipv4'
         uci commit firewall
     fi
-
-    service network restart
 }
 
 check_repo
@@ -207,3 +203,5 @@ if [ "$IS_SHOULD_CONFIGURE_AWG_INTERFACE" = "y" ] || [ "$IS_SHOULD_CONFIGURE_AWG
 else
     printf "\033[32;1mSkipping amneziawg interface configuration.\033[0m\n"
 fi
+
+service network restart
