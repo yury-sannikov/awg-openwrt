@@ -20,7 +20,7 @@ install_awg_packages() {
     else
         KMOD_AMNEZIAWG_FILENAME="kmod-amneziawg${PKGPOSTFIX}"
         DOWNLOAD_URL="${BASE_URL}v${VERSION}/${KMOD_AMNEZIAWG_FILENAME}"
-        curl -L -o "$AWG_DIR/$KMOD_AMNEZIAWG_FILENAME" "$DOWNLOAD_URL"
+        wget -O "$AWG_DIR/$KMOD_AMNEZIAWG_FILENAME" "$DOWNLOAD_URL"
 
         if [ $? -eq 0 ]; then
             echo "kmod-amneziawg file downloaded successfully"
@@ -44,7 +44,7 @@ install_awg_packages() {
     else
         AMNEZIAWG_TOOLS_FILENAME="amneziawg-tools${PKGPOSTFIX}"
         DOWNLOAD_URL="${BASE_URL}v${VERSION}/${AMNEZIAWG_TOOLS_FILENAME}"
-        curl -L -o "$AWG_DIR/$AMNEZIAWG_TOOLS_FILENAME" "$DOWNLOAD_URL"
+        wget -O "$AWG_DIR/$AMNEZIAWG_TOOLS_FILENAME" "$DOWNLOAD_URL"
 
         if [ $? -eq 0 ]; then
             echo "amneziawg-tools file downloaded successfully"
@@ -68,7 +68,7 @@ install_awg_packages() {
     else
         LUCI_APP_AMNEZIAWG_FILENAME="luci-app-amneziawg${PKGPOSTFIX}"
         DOWNLOAD_URL="${BASE_URL}v${VERSION}/${LUCI_APP_AMNEZIAWG_FILENAME}"
-        curl -L -o "$AWG_DIR/$LUCI_APP_AMNEZIAWG_FILENAME" "$DOWNLOAD_URL"
+        wget -O "$AWG_DIR/$LUCI_APP_AMNEZIAWG_FILENAME" "$DOWNLOAD_URL"
 
         if [ $? -eq 0 ]; then
             echo "luci-app-amneziawg file downloaded successfully"
