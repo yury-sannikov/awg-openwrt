@@ -23,10 +23,10 @@ jobs:
             subtarget: mt7621
             vermagic: "9c242f353867f49a96054ff8c9f2c460"
           - tag: "23.05.2"
-            pkgarch: mipsel_24kc
-            target: ramips
-            subtarget: mt7621
-            vermagic: "9c242f353867f49a96054ff8c9f2c460"
+            pkgarch: aarch64_generic 
+            target: rockchip
+            subtarget: armv8
+            vermagic: "7099fd410828098dc6580ac1b9004dcd"
 
     steps:
       - uses: actions/checkout@v4
