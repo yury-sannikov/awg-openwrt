@@ -14,8 +14,8 @@ jobs:
         build_env:
           - tag: "23.05.5"
             pkgarch: aarch64_generic
-            target: armvirt
-            subtarget: 64
+            target:  armsr
+            subtarget: armv8
             vermagic: "1ba67a4e98ce3ad67e1a12de5988cf59"
 
     steps:
