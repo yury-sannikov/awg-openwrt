@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         build_env:
-          - tag: "23.05"
+          - tag: "23.05.4"
             pkgarch: aarch64_generic
             target: armvirt
             subtarget: 64
