@@ -17,6 +17,16 @@ jobs:
             target: mediatek
             subtarget: mt7622
             vermagic: "e5d3f10caf557aa87c86215d61a42644"
+          - tag: "23.05.5"
+            pkgarch: aarch64_cortex-a53
+            target: mediatek
+            subtarget: mt7622
+            vermagic: "e5d3f10caf557aa87c86215d61a42644"
+          - tag: "23.05.5"
+            pkgarch: aarch64_cortex-a53
+            target: mediatek
+            subtarget: mt7622
+            vermagic: "e5d3f10caf557aa87c86215d61a42644"
 
     steps:
       - uses: actions/checkout@v4
@@ -114,4 +124,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: awgrelease/*.ipk
-
