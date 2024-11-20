@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: "v${{ matrix.build_env.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         build_env:
