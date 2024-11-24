@@ -16,7 +16,7 @@ jobs:
             pkgarch: aarch64_generic
             target:  armsr
             subtarget: armv8
-            vermagic: "ac9ae6f5ee73874509a91514807da005-r1"
+            vermagic: "e3e13d375ccd37aa3daf25b94d0ecc97"
 
     steps:
       - uses: actions/checkout@v4
