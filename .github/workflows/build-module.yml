@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         build_env:
-          - tag: "SNAPSHOT r0-2266449"
+          - tag: "SNAPSHOT"
             pkgarch: aarch64_generic
             target:  armsr
             subtarget: armv8
