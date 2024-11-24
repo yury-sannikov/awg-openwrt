@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         build_env:
-          - tag: "23.05.4"
+          - tag: "SNAPSHOT r0-2266449"
             pkgarch: aarch64_generic
             target:  armsr
             subtarget: armv8
-            vermagic: "1ba67a4e98ce3ad67e1a12de5988cf59"
+            vermagic: "ac9ae6f5ee73874509a91514807da005-r1"
 
     steps:
       - uses: actions/checkout@v4
